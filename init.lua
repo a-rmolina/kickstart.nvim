@@ -97,6 +97,10 @@ vim.g.have_nerd_font = false
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.expandtab = true
 
 -- Make line numbers default
 vim.opt.number = true
@@ -645,7 +649,24 @@ require('lazy').setup({
           },
         },
       }
+      local lspconfig = require 'lspconfig'
 
+      local function find_compile_commands()
+        local candidates = { 'build', 'cmake-build-debug', 'cmake-build-release' }
+        for _, dir in ipairs(candidates) do
+          local path = vim.fn.getcwd() .. '/' .. dir .. 'compile_commands.json'
+          if vim.fn.filereadable(path) == 1 then
+            return dir
+          end
+        end
+        return nil
+      end
+
+      local build_dir = find_compile_commands() or 'build'
+
+      lspconfig.clangd.setup {
+        cmd = { 'clangd', '--compile-commands-dir=' .. build_dir },
+      }
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
@@ -850,7 +871,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'retrobox'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
