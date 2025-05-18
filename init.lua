@@ -81,7 +81,7 @@ If you experience any errors while trying to install kickstart, run `:checkhealt
 I hope you enjoy your Neovim journey,
 - TJ
 
-P.S. You can delete this when you're done too. It's your config now! :)
+  P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 -- Set <space> as the leader key
@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -108,6 +108,16 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
+-- Set the color column at 80 characters
+vim.o.colorcolumn = '80'
+
+-- Set the color of the column to dark green
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  callback = function()
+    vim.cmd [[highlight ColorColumn guibg=#003300 ctermbg=22]]
+  end,
+})
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
@@ -169,7 +179,6 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -193,8 +202,30 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Keybinds to center the window after scrolling
+--  Use CTRL+<hjkl> to switch between windows
+--
+vim.keymap.set('n', '<C-U>', '<C-U>zz', { desc = 'Move up and center the cursor' })
+vim.keymap.set('n', '<C-D>', '<C-D>zz', { desc = 'Move down and center the cursor' })
+vim.keymap.set('n', '<C-F>', '<C-F>zz', { desc = 'Move forward and center the cursor' })
+vim.keymap.set('n', '<C-B>', '<C-B>zz', { desc = 'Move backwards and center the cursor' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
+-- Create an autocmd group (optional but good practice)
+vim.api.nvim_create_augroup('CppSettings', { clear = true })
+
+-- Set tab to 2 spaces for C++ files
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'CppSettings',
+  pattern = { 'cpp', 'c', 'h', 'hpp' }, -- include .c and .h if you want
+  callback = function()
+    vim.b.editorconfig = false -- disables vim-sleuth for the buffer
+    vim.bo.tabstop = 2 -- Number of spaces a <Tab> in the file counts for
+    vim.bo.shiftwidth = 2 -- Number of spaces to use for each step of (auto)indent
+    vim.bo.expandtab = true -- Use spaces instead of tabs
+  end,
+})
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
